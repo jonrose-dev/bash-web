@@ -1,5 +1,7 @@
 # bash-wasm-browser
 
+**Live demo: [bash-drab.vercel.app](https://bash-drab.vercel.app/)**
+
 A Next.js app that demonstrates running bash scripts directly in the browser via WebAssembly. Built on top of [bash-wasm](https://github.com/bahamas10/bash-wasm) by [@bahamas10](https://github.com/bahamas10), which compiles Bash 5.3 to wasm using Emscripten.
 
 This is a proof of concept — the goal is to show what's possible when bash runs in the browser. DOM manipulation support is in its early stages, with more commands planned.
