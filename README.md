@@ -1,36 +1,82 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# bash-wasm-browser
 
-## Getting Started
+A Next.js app that demonstrates running bash scripts directly in the browser via WebAssembly. Built on top of [bash-wasm](https://github.com/bahamas10/bash-wasm) by [@bahamas10](https://github.com/bahamas10), which compiles Bash 5.3 to wasm using Emscripten.
 
-First, run the development server:
+This is a proof of concept — the goal is to show what's possible when bash runs in the browser. DOM manipulation support is in its early stages, with more commands planned.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## How it works
+
+`bashLoader.js` scans the page for `<script type="text/bash">` tags and runs them through the wasm-compiled bash binary. Scripts can be inline or loaded from an external file via `src`.
+
+```html
+<!-- inline -->
+<script type="text/bash">
+web dom.write '#output' "Hello from bash!"
+</script>
+
+<!-- external -->
+<script type="text/bash" src="/scripts/hello.sh"></script>
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## The `web` built-in
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Bash scripts have access to a `web` command for interacting with the page. This is the beginning of what will become a fuller DOM API for bash-in-the-browser.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### `web dom.write`
 
-## Learn More
+Sets the text content of an element.
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+web dom.write '#selector' "text content"
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### `web dom.appendHTML`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Appends HTML to an element.
 
-## Deploy on Vercel
+```bash
+web dom.appendHTML '#selector' "<strong>bold text</strong>"
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### `web document.title`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Sets the page title.
+
+```bash
+web document.title "My New Title"
+```
+
+All `web` commands return `0` on success and `1` if the selector doesn't match any element.
+
+## stdout
+
+Output written to stdout (e.g. `echo`) is forwarded to the browser console. Open DevTools to see it.
+
+```bash
+echo "hello from bash"  # appears in the console
+```
+
+## JavaScript API
+
+`bashLoader.js` exposes `window.runBashScript(src)` globally, so you can run bash scripts from JavaScript at any time:
+
+```js
+await window.runBashScript('echo "hello from JS"');
+```
+
+## Known limitations
+
+- No job control — background processes (`&`, `wait`) are not supported in wasm
+- No user/group identity — syscalls like `getresgid` are stubbed out (harmless)
+- Scripts must be non-interactive
+- External `.sh` files must be served from the same origin or a CORS-enabled server
+
+## Credits
+
+- [bash-wasm](https://github.com/bahamas10/bash-wasm) by [@bahamas10](https://github.com/bahamas10) — the foundation that makes all of this possible
+- [GNU Bash 5.3](https://www.gnu.org/software/bash/)
+- [Emscripten](https://emscripten.org/)
+
+## License
+
+GPLv3 (inherited from Bash)
