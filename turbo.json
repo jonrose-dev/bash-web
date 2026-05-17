@@ -9,7 +9,14 @@
       "dependsOn": ["^build"],
       "outputs": ["dist/**", ".next/**"]
     },
+    "lint": {
+      "cache": false
+    },
+    "format": {
+      "cache": false
+    },
     "dev": {
+      "dependsOn": ["^build"],
       "cache": false,
       "persistent": true
     }

@@ -8,7 +8,7 @@ export const TryMe = () => {
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!ref.current?.value) return;
-    void globalThis.window.runBashScript(ref.current.value);
+    void window.runBashScript(ref.current.value);
   };
 
   return (

@@ -29,14 +29,18 @@ export const Home = () => {
               className="flex items-baseline gap-3 border-l pl-3 py-0.5"
               style={{ borderColor: "var(--green-dim)" }}
             >
-              <dt className="text-ctp-overlay1 shrink-0 select-none">&lt;script&gt;</dt>
+              <dt className="text-ctp-overlay1 shrink-0 select-none">
+                &lt;script&gt;
+              </dt>
               <output id="hello" className="text-ctp-subtext0" />
             </div>
             <div
               className="flex items-baseline gap-3 border-l pl-3 py-0.5"
               style={{ borderColor: "var(--green-dim)" }}
             >
-              <dt className="text-ctp-overlay1 shrink-0 select-none">jonrose.sh</dt>
+              <dt className="text-ctp-overlay1 shrink-0 select-none">
+                jonrose.sh
+              </dt>
               <output id="world" className="text-ctp-subtext0" />
             </div>
           </dl>

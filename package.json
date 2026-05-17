@@ -3,7 +3,9 @@
   "packageManager": "pnpm@11.1.2",
   "scripts": {
     "dev": "turbo run dev",
-    "build": "turbo run build"
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "format": "turbo run format"
   },
   "engines": {
     "pnpm": ">=11.1.2",

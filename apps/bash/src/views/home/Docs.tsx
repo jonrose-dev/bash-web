@@ -8,7 +8,7 @@ const BUILTINS = [
     desc: "append innerHTML to element",
   },
   {
-    cmd: "web document.title \"title\"",
+    cmd: 'web document.title "title"',
     desc: "set document.title",
   },
 ] as const;
