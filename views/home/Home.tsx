@@ -45,6 +45,16 @@ export const Home = () => {
         <p className="mt-5 text-center text-xs text-ctp-overlay0 select-none">
           bash 5.3 · WebAssembly
         </p>
+        <p className="mt-1 text-center text-xs">
+          <a
+            href="https://github.com/jonrose-dev/bash-web"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-ctp-overlay1 hover:text-ctp-blue transition-colors"
+          >
+            github.com/jonrose-dev/bash-web
+          </a>
+        </p>
       </main>
     </div>
   );
