@@ -12,7 +12,7 @@ declare global {
     runBashScript: (src: string) => Promise<void>;
   }
 
-  var __bash_web_internal: (argv: string[]) => number;
+  var __bash_web_internal: (argv: string[]) => Promise<number | string>;
   var runBashScript: (src: string) => Promise<void>;
 }
 

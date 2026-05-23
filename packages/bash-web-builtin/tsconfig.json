@@ -8,5 +8,5 @@
 		"skipLibCheck": true,
 		"ignoreDeprecations": "6.0"
 	},
-	"include": ["../bash-web-builtin/srcbash-web/src"]
+	"include": ["./src"]
 }
