@@ -117,40 +117,40 @@ mergeInto(LibraryManager.library, {
   // Called by nojobs.c's make_child() → fork()
   fork__deps: ['$ERRNO_CODES', '$PThread'],
   fork__async: true,
-  fork: function() {
-    return Asyncify.handleSleep(function(wakeUp) {
+  fork() {
+    return Asyncify.handleSleep((wakeUp) => {
       // At this point Asyncify has unwound the wasm stack into linear memory.
       // The entire process state (stack frames, heap) is in HEAPU8.buffer.
 
-      var childPid = _nextPid++;
+      const childPid = _nextPid++;
 
       // Allocate a shared status cell: child writes exit code here when done,
       // parent reads it in waitpid().
-      var statusBuf = new SharedArrayBuffer(4);
+      const statusBuf = new SharedArrayBuffer(4);
       _pidStatusMap[childPid] = statusBuf;
 
       // Snapshot the current linear memory (the SAB).
       // This is the "copy" part of copy-on-write fork.
-      var memSnapshot = HEAPU8.buffer.slice(0);
+      const memSnapshot = HEAPU8.buffer.slice(0);
 
       // Snapshot wasm globals — these live outside linear memory and must be
       // transferred explicitly. Emscripten exposes them via the module.
-      var globals = _captureGlobals();
+      const globals = _captureGlobals();
 
       // Spawn the child Worker. It will receive the memory snapshot and
       // Asyncify stack data, load the same wasm module, then rewind.
-      var worker = new Worker(/* same worker script URL as current worker */);
+      const worker = new Worker(/* same worker script URL as current worker */);
 
       worker.postMessage({
         type: 'fork-child',
-        memory: memSnapshot,      // ArrayBuffer (detached from parent's SAB)
-        globals: globals,
+        memory: memSnapshot,           // ArrayBuffer (detached from parent's SAB)
+        globals,
         asyncifyStack: _getAsyncifyData(),  // the unwound stack region
         pid: childPid,
-        statusBuf: statusBuf,     // shared — parent reads this in waitpid()
+        statusBuf,                     // shared — parent reads this in waitpid()
       });
 
-      worker.onmessage = function(e) {
+      worker.onmessage = (e) => {
         if (e.data.type === 'exit') {
           // Record that this child has exited (used by waitpid)
           Atomics.store(new Int32Array(statusBuf), 0, e.data.status);
@@ -165,16 +165,16 @@ mergeInto(LibraryManager.library, {
 
   // Blocks until child `pid` exits. Called by bash after make_child().
   waitpid__async: true,
-  waitpid: function(pid, statusPtr, options) {
-    return Asyncify.handleSleep(function(wakeUp) {
-      var statusBuf = _pidStatusMap[pid];
+  waitpid(pid, statusPtr, options) {
+    return Asyncify.handleSleep((wakeUp) => {
+      const statusBuf = _pidStatusMap[pid];
       if (!statusBuf) { wakeUp(-1); return; }
 
-      var cell = new Int32Array(statusBuf);
+      const cell = new Int32Array(statusBuf);
       // Atomics.waitAsync is non-blocking on the main thread;
       // in a Worker (PROXY_TO_PTHREAD) we can use Atomics.wait.
-      Atomics.waitAsync(cell, 0, 0).value.then(function() {
-        var exitStatus = Atomics.load(cell, 0);
+      Atomics.waitAsync(cell, 0, 0).value.then(() => {
+        const exitStatus = Atomics.load(cell, 0);
         if (statusPtr) HEAP32[statusPtr >> 2] = (exitStatus & 0xff) << 8;
         delete _pidStatusMap[pid];
         wakeUp(pid);
@@ -183,7 +183,7 @@ mergeInto(LibraryManager.library, {
   },
 
   // Called in the child after it finishes to signal the parent.
-  _web_fork_child_exit: function(status) {
+  _web_fork_child_exit(status) {
     // Writes exit status to the shared cell and terminates this Worker.
     // The parent's waitpid Atomics.waitAsync fires when Atomics.notify runs.
     // (Implemented in fork-child Worker startup code, not here.)
@@ -192,10 +192,10 @@ mergeInto(LibraryManager.library, {
 });
 
 // Module-level state (lives in each Worker independently after fork)
-var _nextPid = 2;           // pid 1 is the "shell" itself
-var _pidStatusMap = {};     // pid → SharedArrayBuffer (exit status cell)
+let _nextPid = 2;            // pid 1 is the "shell" itself
+const _pidStatusMap = {};    // pid → SharedArrayBuffer (exit status cell)
 
-function _captureGlobals() {
+const _captureGlobals = () => {
   // Return a snapshot of wasm module globals that need to be restored
   // in the child. Exact list depends on Emscripten's generated code;
   // at minimum: __stack_pointer, __memory_base, any Asyncify globals.
@@ -203,21 +203,21 @@ function _captureGlobals() {
     stackPointer: _emscripten_stack_get_current(),
     // ... enumerate via Module.asm exports
   };
-}
+};
 
-function _getAsyncifyData() {
+const _getAsyncifyData = () => {
   // Return the memory range containing the Asyncify-unwound stack.
   // Emscripten stores this starting at _asyncify_data_ptr.
-  var ptr = Module.asm.__asyncify_data.value;
-  var top = HEAP32[(ptr + 4) >> 2];
-  return { ptr: ptr, top: top, snapshot: HEAPU8.slice(ptr, top) };
-}
+  const ptr = Module.asm.__asyncify_data.value;
+  const top = HEAP32[(ptr + 4) >> 2];
+  return { ptr, top, snapshot: HEAPU8.slice(ptr, top) };
+};
 ```
 
 The Worker startup code (in the worker script) handles the `fork-child` message:
 
 ```js
-self.onmessage = function(e) {
+self.onmessage = (e) => {
   if (e.data.type !== 'fork-child') return;
 
   // Load the wasm module with the copied memory snapshot.
@@ -231,10 +231,10 @@ self.onmessage = function(e) {
     // Restore Asyncify stack region
     // Then call Asyncify rewind — this resumes execution right after the
     // fork() call, returning 0 (the child's return value).
-  }).then(function(mod) {
+  }).then((mod) => {
     // Override exit() to signal the parent instead of terminating the Worker.
-    mod.onExit = function(status) {
-      self.postMessage({ type: 'exit', status: status });
+    mod.onExit = (status) => {
+      self.postMessage({ type: 'exit', status });
       self.close();
     };
   });
