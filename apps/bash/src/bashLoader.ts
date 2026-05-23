@@ -1,36 +1,6 @@
-import "@bash-web/bash-core";
+import { webBuiltin } from "@bash-web/bash-web-builtin";
 
-const SUCCESS = 0;
-const ERROR = 1;
-
-const webBuiltin = (argv: string[]): number => {
-  const [cmd, ...args] = argv;
-  switch (cmd) {
-    case "dom.write": {
-      const [selector, text] = args;
-      const el = document.querySelector(selector);
-      if (!el) return ERROR;
-      el.textContent = text;
-      return SUCCESS;
-    }
-    case "dom.appendHTML": {
-      const [selector, html] = args;
-      const el = document.querySelector(selector);
-      if (!el) return ERROR;
-      el.innerHTML += html;
-      return SUCCESS;
-    }
-    case "document.title": {
-      document.title = args[0];
-      return SUCCESS;
-    }
-    default:
-      console.error("unknown command");
-      return ERROR;
-  }
-};
-
-const runBashScript = async (src: string): Promise<void> => {
+const runBashScript = async (src: string) => {
   const opts = {
     noInitialRun: true,
     print: console.log,
@@ -50,7 +20,7 @@ const runBashScript = async (src: string): Promise<void> => {
 
   mod.FS.writeFile("/script", `${src}\n`);
 
-  mod.callMain(["/script"]);
+  await mod.callMain(["/script"]);
 };
 
 document

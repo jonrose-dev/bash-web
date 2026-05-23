@@ -1,0 +1,20 @@
+{
+	"name": "@bash-web/bash-web-builtin",
+	"version": "0.0.0",
+	"private": true,
+	"main": "src/index.ts",
+	"types": "src/index.ts",
+	"exports": {
+		".": "./src/index.ts"
+	},
+	"scripts": {
+		"build": "tsup",
+		"format": "biome format --write .",
+		"dev": "tsup --watch"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.4.15",
+		"tsup": "^8",
+		"typescript": "6.0.3"
+	}
+}

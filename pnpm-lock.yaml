@@ -20,9 +20,9 @@ importers:
 
   apps/bash:
     dependencies:
-      '@bash-web/bash-core':
+      '@bash-web/bash-web-builtin':
         specifier: workspace:*
-        version: link:../../packages/bash-core
+        version: link:../../packages/bash-web-builtin
       next:
         specifier: 16.2.6
         version: 16.2.6(@babel/core@7.29.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -64,8 +64,11 @@ importers:
         specifier: 6.0.3
         version: 6.0.3
 
-  packages/bash-core:
+  packages/bash-web-builtin:
     devDependencies:
+      '@biomejs/biome':
+        specifier: ^2.4.15
+        version: 2.4.15
       tsup:
         specifier: ^8
         version: 8.5.1(jiti@2.7.0)(postcss@8.5.14)(typescript@6.0.3)

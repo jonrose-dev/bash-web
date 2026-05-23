@@ -10,7 +10,7 @@
     "lint": "biome check --write --unsafe ."
   },
   "dependencies": {
-    "@bash-web/bash-core": "workspace:*",
+    "@bash-web/bash-web-builtin": "workspace:*",
     "next": "16.2.6",
     "react": "19.2.4",
     "react-dom": "19.2.4"
